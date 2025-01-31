@@ -44,7 +44,11 @@ export const AgentsPage: Component = () => {
                             {(agent) => (
                                 <tr style={{cursor: "pointer"}} onClick={() => handleAgentClick(agent.id)}>
                                     <td class="fs-6 text-truncate">{agent.id}</td>
-                                    <td class="fs-6"><pre>{agent.profileAddress}</pre></td>
+                                    <td class="fs-6"><span class="badge bg-light font-monospace"
+                                                           onClick={(e) => {
+                                                               e.stopImmediatePropagation();
+                                                               e.preventDefault()
+                                                           }}>{agent.profileAddress}</span></td>
                                     <td class="fs-6">{agent.topic}</td>
                                     <td class="fs-6">{formatAmount(agent.fee)}</td>
                                     <td class="fs-6">{formatAmount(agent.tokenBalance || "0")}</td>
