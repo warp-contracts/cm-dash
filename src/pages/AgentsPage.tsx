@@ -2,6 +2,7 @@ import {Component, createResource, For, Show} from "solid-js";
 import {useNavigate} from "@solidjs/router";
 import {Preloader} from "../components/Preloader";
 import {fetchMarketData} from "../ao/fetch-market-data";
+import {formatAmount} from "../utils/formatters";
 
 export const AgentsPage: Component = () => {
     const navigate = useNavigate();
@@ -14,7 +15,7 @@ export const AgentsPage: Component = () => {
 
     return (
         <div class="container">
-            <h1 class="display-6">Agents</h1>
+            <h1 class="display-5">Agents</h1>
 
             <Show when={marketData.loading}>
                 <Preloader/>
@@ -43,10 +44,10 @@ export const AgentsPage: Component = () => {
                             {(agent) => (
                                 <tr style={{cursor: "pointer"}} onClick={() => handleAgentClick(agent.id)}>
                                     <td class="fs-6 text-truncate">{agent.id}</td>
-                                    <td class="fs-6">{agent.profileAddress}</td>
+                                    <td class="fs-6"><pre>{agent.profileAddress}</pre></td>
                                     <td class="fs-6">{agent.topic}</td>
-                                    <td class="fs-6">{agent.fee}</td>
-                                    <td class="fs-6">{agent.tokenBalance || 0}</td>
+                                    <td class="fs-6">{formatAmount(agent.fee)}</td>
+                                    <td class="fs-6">{formatAmount(agent.tokenBalance || "0")}</td>
                                 </tr>
                             )}
                         </For>

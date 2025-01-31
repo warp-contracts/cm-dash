@@ -3,6 +3,7 @@ import {useNavigate} from "@solidjs/router";
 import {TaskStatus} from "../types/types";
 import {cachedMarketData} from "../ao/fetch-market-data";
 import {Preloader} from "../components/Preloader";
+import {formatAmount} from "../utils/formatters";
 
 export const TasksPage: Component = () => {
     const navigate = useNavigate();
@@ -30,7 +31,7 @@ export const TasksPage: Component = () => {
 
     return (
         <div class="container">
-            <h1 class="display-6">Tasks</h1>
+            <h1 class="display-5">Tasks</h1>
             <Show when={marketData.loading}>
                 <Preloader/>
             </Show>
@@ -102,7 +103,7 @@ export const TasksPage: Component = () => {
                                 <td class="fs-6">{task.requesterId}</td>
                                 <td class="fs-6">{task.agentId || 'N/A'}</td>
                                 <td class="fs-6">{task.topic}</td>
-                                <td class="fs-6">{task.reward}</td>
+                                <td class="fs-6">{formatAmount(task.reward)}</td>
                                 <td class="fs-6">{task.status}</td>
                                 <td class="fs-6 text-truncate">{(new Date(task.timestamp)).toISOString()}</td>
                             </tr>

@@ -2,6 +2,7 @@ import {Component, createMemo, createResource, Show} from "solid-js";
 import {useParams} from "@solidjs/router";
 import {cachedMarketData} from "../ao/fetch-market-data";
 import {Preloader} from "../components/Preloader";
+import {formatAmount} from "../utils/formatters";
 
 export const TaskDetailsPage: Component = () => {
     const [marketData] = createResource(cachedMarketData);
@@ -13,7 +14,7 @@ export const TaskDetailsPage: Component = () => {
 
     return (
         <div class="container">
-            <h1 class="display-6">Task Details</h1>
+            <h1 class="display-5">Task Details</h1>
             <Show when={marketData.loading}>
                 <Preloader/>
             </Show>
@@ -31,7 +32,7 @@ export const TaskDetailsPage: Component = () => {
                         <strong>Requesting Agent ID:</strong> {task()?.requesterId}
                     </div>
                     <div class="mb-3">
-                        <strong>Reward:</strong> {task()?.reward}
+                        <strong>Reward:</strong> {formatAmount(task()?.reward)}
                     </div>
                     <div class="mb-3">
                         <strong>Matching Strategy:</strong> {task()?.matchingStrategy}
@@ -40,7 +41,8 @@ export const TaskDetailsPage: Component = () => {
                         <strong>Topic:</strong> {task()?.topic}
                     </div>
                     <div class="mb-3">
-                        <strong>Payload:</strong> <pre>{JSON.stringify(task()?.payload)}</pre>
+                        <strong>Payload:</strong>
+                        <pre>{JSON.stringify(task()?.payload)}</pre>
                     </div>
                     <div class="mb-3">
                         <strong>Status:</strong> {task()?.status}

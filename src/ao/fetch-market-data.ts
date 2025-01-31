@@ -1,39 +1,60 @@
 import {dryrun} from "@permaweb/aoconnect";
 import {Agent, MarketTask, TaskStatus} from "../types/types";
 
-const processId = 'sFuGUEb08JBSWiRmgxiI0cF_ADOR-RS0vz9MqXWHgKg';
-let cache: { agents: Agent[], tasks: MarketTask[] } | null = null;
+const processId = 'OpT0J0BOXoZfIkbAFgmMecSBmJdTyJ5dr5GhXFjhfJA';
 
-export async function fetchMarketData(...args: any[]) {
-    console.log("Cache", args);
+type MarketDataResult = { agents: Agent[], tasks: MarketTask[], totals: { done: number, rewards: string } };
+let cache: MarketDataResult | null = null;
 
-    console.log("Fetching Market Data...", cache);
-    const [agentsResponse, tasksResponse] =
-        await Promise.all([
-            dryrun({
-                process: processId,
-                data: '',
-                tags: [{name: 'Action', value: 'List-Agents'}]
-            }),
-            dryrun({
-                process: processId,
-                data: '',
-                tags: [{name: 'Action', value: 'Tasks-Queue'}]
-            })
-        ]);
+let alreadyFetching: Promise<MarketDataResult> | null = null;
 
-    const rawAgents = JSON.parse(agentsResponse.Messages[0].Data);
-    const rawTasks = JSON.parse(tasksResponse.Messages[0].Data);
-    const tasks = [...flattenTasks(rawAgents), ...rawTasks.map((task: MarketTask) => ({
-        ...task,
-        status: "queued"
-    }))];
-    cache = {
-        agents: rawAgents,
-        tasks
+export async function fetchMarketData() {
+    if (alreadyFetching) {
+        return alreadyFetching;
+    } else {
+        alreadyFetching = new Promise<MarketDataResult>(async (resolve, reject) => {
+            console.log("Fetching Market Data...", cache);
+            try {
+                const response = await dryrun({
+                    process: processId,
+                    data: '',
+                    tags: [{name: 'Action', value: 'Dashboard-Data'}]
+                });
+                const parsedData = JSON.parse(response.Messages[0].Data);
+
+                const rawAgents = parsedData.agents.map((a: Agent) => {
+                    if (!a.totals) {
+                        // @ts-ignore
+                        a.totals = {
+                            requested: 0,
+                            assigned: 0,
+                            done: 0,
+                            rewards: "0"
+                        }
+                    }
+                    a.totals.waiting = a.totals.assigned - a.totals.done;
+                    return a;
+                });
+                const rawTasks = parsedData.queue;
+                const tasks = [...flattenTasks(rawAgents), ...rawTasks.map((task: MarketTask) => ({
+                    ...task,
+                    status: "queued"
+                }))];
+                cache = {
+                    agents: rawAgents,
+                    tasks,
+                    totals: parsedData.totals
+                }
+                resolve(cache);
+            } catch (error) {
+                reject(error);
+            } finally {
+                alreadyFetching = null;
+            }
+
+        });
+        return alreadyFetching;
     }
-
-    return cache;
 }
 
 function flattenTasks(agents: any[]) {
@@ -62,6 +83,6 @@ export async function cachedMarketData() {
     if (cache) {
         return cache;
     } else {
-        return fetchMarketData(true);
+        return fetchMarketData();
     }
 }

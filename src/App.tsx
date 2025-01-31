@@ -10,24 +10,21 @@ import {TaskDetailsPage} from "./pages/TaskDetailsPage";
 const Layout = (props: any) => {
     return (
         <>
-            <Navbar />
-            {props.children}
+            <Navbar/>
+            <div class="container">{props.children}</div>
             <footer></footer>
         </>
     );
 };
 
-// ----------------------------------------------------------------------------
-// 7) Root App Component
-// ----------------------------------------------------------------------------
 const App: Component = () => {
     return (
-        <Router root={Layout} >
-            <Route path="/" component={AgentsPage}  />
-            <Route path="/agents" component={AgentsPage}  />
-            <Route path="/agents/:id" component={AgentDetailsPage}  />
-            <Route path="/tasks" component={TasksPage}  />
-            <Route path="/tasks/:id" component={TaskDetailsPage}  />
+        <Router root={Layout}>
+            <Route path="/" component={AgentsPage}/>
+            <Route path="/agents" component={AgentsPage}/>
+            <Route path="/agents/:id" component={AgentDetailsPage}/>
+            <Route path="/tasks" component={TasksPage}/>
+            <Route path="/tasks/:id" component={TaskDetailsPage}/>
         </Router>
     );
 };
